@@ -1,0 +1,120 @@
+﻿2026-08-19T19:00:16.4627902Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-19T19:00:16.4634369Z ##[group]Run actions/checkout@v4
+2026-08-19T19:00:16.4634894Z with:
+2026-08-19T19:00:16.4635085Z   submodules: recursive
+2026-08-19T19:00:16.4635304Z   repository: rakibulroyale940-wq/conduit
+2026-08-19T19:00:16.4637373Z   token: ***
+2026-08-19T19:00:16.4637559Z   ssh-strict: true
+2026-08-19T19:00:16.4637750Z   ssh-user: git
+2026-08-19T19:00:16.4637931Z   persist-credentials: true
+2026-08-19T19:00:16.4638163Z   clean: true
+2026-08-19T19:00:16.4638344Z   sparse-checkout-cone-mode: true
+2026-08-19T19:00:16.4638562Z   fetch-depth: 1
+2026-08-19T19:00:16.4638733Z   fetch-tags: false
+2026-08-19T19:00:16.4638917Z   show-progress: true
+2026-08-19T19:00:16.4639093Z   lfs: false
+2026-08-19T19:00:16.4639310Z   set-safe-directory: true
+2026-08-19T19:00:16.4639517Z   allow-unsafe-pr-checkout: false
+2026-08-19T19:00:16.4639909Z ##[endgroup]
+2026-08-19T19:00:16.5514136Z Syncing repository: rakibulroyale940-wq/conduit
+2026-08-19T19:00:16.5516423Z ##[group]Getting Git version info
+2026-08-19T19:00:16.5516919Z Working directory is '/home/runner/work/conduit/conduit'
+2026-08-19T19:00:16.5517592Z [command]/usr/bin/git version
+2026-08-19T19:00:16.5946351Z git version 2.54.0
+2026-08-19T19:00:16.6026733Z ##[endgroup]
+2026-08-19T19:00:16.6055768Z Temporarily overriding HOME='/home/runner/work/_temp/a1dfa517-ad20-48f2-9f17-2294766db258' before making global git config changes
+2026-08-19T19:00:16.6081185Z Adding repository directory to the temporary git global config as a safe directory
+2026-08-19T19:00:16.6082710Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/conduit/conduit
+2026-08-19T19:00:16.6084682Z Deleting the contents of '/home/runner/work/conduit/conduit'
+2026-08-19T19:00:16.6112246Z ##[group]Initializing the repository
+2026-08-19T19:00:16.6118364Z [command]/usr/bin/git init /home/runner/work/conduit/conduit
+2026-08-19T19:00:16.6209007Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-08-19T19:00:16.6226568Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-08-19T19:00:16.6236175Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-08-19T19:00:16.6237203Z hint: call:
+2026-08-19T19:00:16.6237691Z hint:
+2026-08-19T19:00:16.6238517Z hint: 	git config --global init.defaultBranch <name>
+2026-08-19T19:00:16.6238940Z hint:
+2026-08-19T19:00:16.6239326Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-08-19T19:00:16.6239956Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-08-19T19:00:16.6240428Z hint:
+2026-08-19T19:00:16.6240678Z hint: 	git branch -m <name>
+2026-08-19T19:00:16.6240954Z hint:
+2026-08-19T19:00:16.6241340Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-08-19T19:00:16.6241801Z Initialized empty Git repository in /home/runner/work/conduit/conduit/.git/
+2026-08-19T19:00:16.6242835Z [command]/usr/bin/git remote add origin https://github.com/rakibulroyale940-wq/conduit
+2026-08-19T19:00:16.6276995Z ##[endgroup]
+2026-08-19T19:00:16.6277945Z ##[group]Disabling automatic garbage collection
+2026-08-19T19:00:16.6279920Z [command]/usr/bin/git config --local gc.auto 0
+2026-08-19T19:00:16.6324925Z ##[endgroup]
+2026-08-19T19:00:16.6325610Z ##[group]Setting up auth
+2026-08-19T19:00:16.6334151Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-08-19T19:00:16.6377223Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-08-19T19:00:16.8595145Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-08-19T19:00:16.8626982Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-08-19T19:00:16.8829247Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-08-19T19:00:16.8864028Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-08-19T19:00:16.9082615Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-08-19T19:00:16.9117676Z ##[endgroup]
+2026-08-19T19:00:16.9118175Z ##[group]Fetching the repository
+2026-08-19T19:00:16.9125558Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +7d490001421e04a099e7a96f5356872dcf52f9cd:refs/remotes/origin/main
+2026-08-19T19:00:19.5426642Z From https://github.com/rakibulroyale940-wq/conduit
+2026-08-19T19:00:19.5427414Z  * [new ref]         7d490001421e04a099e7a96f5356872dcf52f9cd -> origin/main
+2026-08-19T19:00:19.5455490Z ##[endgroup]
+2026-08-19T19:00:19.5456074Z ##[group]Determining the checkout info
+2026-08-19T19:00:19.5456609Z ##[endgroup]
+2026-08-19T19:00:19.5457045Z [command]/usr/bin/git sparse-checkout disable
+2026-08-19T19:00:19.5496195Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-08-19T19:00:19.5529563Z ##[group]Checking out the ref
+2026-08-19T19:00:19.5530261Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-08-19T19:00:19.7128065Z Switched to a new branch 'main'
+2026-08-19T19:00:19.7128569Z branch 'main' set up to track 'origin/main'.
+2026-08-19T19:00:19.7140508Z ##[endgroup]
+2026-08-19T19:00:19.7140993Z ##[group]Setting up auth for fetching submodules
+2026-08-19T19:00:19.7145700Z [command]/usr/bin/git config --global http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-08-19T19:00:19.7184683Z [command]/usr/bin/git config --global --unset-all url.https://github.com/.insteadOf
+2026-08-19T19:00:19.7218648Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf git@github.com:
+2026-08-19T19:00:19.7295603Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf org-318736538@github.com:
+2026-08-19T19:00:19.7314064Z ##[endgroup]
+2026-08-19T19:00:19.7315262Z ##[group]Fetching submodules
+2026-08-19T19:00:19.7319463Z [command]/usr/bin/git submodule sync --recursive
+2026-08-19T19:00:19.7525021Z [command]/usr/bin/git -c protocol.version=2 submodule update --init --force --depth=1 --recursive
+2026-08-19T19:00:19.7718492Z Submodule 'openwebui-src' (https://github.com/open-webui/open-webui) registered for path 'openwebui-src'
+2026-08-19T19:00:19.7719654Z Submodule 'third_party/katex' (https://github.com/orestesgaolin/katex.git) registered for path 'third_party/katex'
+2026-08-19T19:00:19.7723361Z Submodule 'third_party/mermaid' (https://github.com/orestesgaolin/mermaid.git) registered for path 'third_party/mermaid'
+2026-08-19T19:00:19.7747794Z Cloning into '/home/runner/work/conduit/conduit/openwebui-src'...
+2026-08-19T19:00:22.7209754Z Cloning into '/home/runner/work/conduit/conduit/third_party/katex'...
+2026-08-19T19:00:24.0653605Z Cloning into '/home/runner/work/conduit/conduit/third_party/mermaid'...
+2026-08-19T19:00:26.2478655Z Submodule path 'openwebui-src': checked out '01f4282f1ffe0d6212f58d3afbeae21fffd0c4be'
+2026-08-19T19:00:27.9342505Z From https://github.com/orestesgaolin/katex
+2026-08-19T19:00:27.9343226Z  * branch            212f328fb6fbcdb88367da3eee47e82afa757a46 -> FETCH_HEAD
+2026-08-19T19:00:27.9725505Z Submodule path 'third_party/katex': checked out '212f328fb6fbcdb88367da3eee47e82afa757a46'
+2026-08-19T19:00:28.0149226Z Submodule path 'third_party/mermaid': checked out 'ddb951169592bf089518ba19dbf3bf7ffa8d3c35'
+2026-08-19T19:00:28.0195712Z [command]/usr/bin/git submodule foreach --recursive git config --local gc.auto 0
+2026-08-19T19:00:28.0388045Z Entering 'openwebui-src'
+2026-08-19T19:00:28.0426372Z Entering 'third_party/katex'
+2026-08-19T19:00:28.0460304Z Entering 'third_party/mermaid'
+2026-08-19T19:00:28.0502061Z ##[endgroup]
+2026-08-19T19:00:28.0502458Z ##[group]Persisting credentials for submodules
+2026-08-19T19:00:28.0526088Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :"
+2026-08-19T19:00:28.0705227Z Entering 'openwebui-src'
+2026-08-19T19:00:28.0752423Z Entering 'third_party/katex'
+2026-08-19T19:00:28.0791960Z Entering 'third_party/mermaid'
+2026-08-19T19:00:28.0842496Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-08-19T19:00:28.1036122Z Entering 'openwebui-src'
+2026-08-19T19:00:28.1070206Z file:/home/runner/work/conduit/conduit/.git/modules/openwebui-src/config	remote.origin.url
+2026-08-19T19:00:28.1094368Z Entering 'third_party/katex'
+2026-08-19T19:00:28.1130699Z file:/home/runner/work/conduit/conduit/.git/modules/third_party/katex/config	remote.origin.url
+2026-08-19T19:00:28.1147640Z Entering 'third_party/mermaid'
+2026-08-19T19:00:28.1182493Z file:/home/runner/work/conduit/conduit/.git/modules/third_party/mermaid/config	remote.origin.url
+2026-08-19T19:00:28.1226621Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'
+2026-08-19T19:00:28.1420394Z Entering 'openwebui-src'
+2026-08-19T19:00:28.1459723Z Entering 'third_party/katex'
+2026-08-19T19:00:28.1493647Z Entering 'third_party/mermaid'
+2026-08-19T19:00:28.1540784Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'org-318736538@github.com:'
+2026-08-19T19:00:28.1732660Z Entering 'openwebui-src'
+2026-08-19T19:00:28.1771696Z Entering 'third_party/katex'
+2026-08-19T19:00:28.1805868Z Entering 'third_party/mermaid'
+2026-08-19T19:00:28.1847850Z ##[endgroup]
+2026-08-19T19:00:28.1888606Z [command]/usr/bin/git log -1 --format=%H
+2026-08-19T19:00:28.1914618Z 7d490001421e04a099e7a96f5356872dcf52f9cd

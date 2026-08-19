@@ -1,0 +1,52 @@
+﻿2026-08-19T19:07:29.5698979Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-08-19T19:07:29.5699921Z Post job cleanup.
+2026-08-19T19:07:30.0377865Z In post-action step
+2026-08-19T19:07:30.0385697Z Stopping all Gradle daemons before saving Gradle User Home state
+2026-08-19T19:07:30.0386377Z Stopping Gradle daemons for /home/runner/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1
+2026-08-19T19:07:30.0397333Z (node:4104) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-08-19T19:07:30.0397963Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-08-19T19:07:30.0402804Z [command]/home/runner/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1/bin/gradle --stop
+2026-08-19T19:07:30.5907564Z 
+2026-08-19T19:07:30.5941004Z Welcome to Gradle 9.3.1!
+2026-08-19T19:07:30.5984868Z 
+2026-08-19T19:07:30.5985332Z Here are the highlights of this release:
+2026-08-19T19:07:30.5985645Z  - Test reporting improvements
+2026-08-19T19:07:30.5985871Z  - Error and warning improvements
+2026-08-19T19:07:30.5986082Z  - Build authoring improvements
+2026-08-19T19:07:30.5986215Z 
+2026-08-19T19:07:30.5986374Z For more details see https://docs.gradle.org/9.3.1/release-notes.html
+2026-08-19T19:07:30.5986596Z 
+2026-08-19T19:07:30.6573676Z Stopping Daemon(s)
+2026-08-19T19:07:30.6577248Z 1 Daemon stopped
+2026-08-19T19:07:30.6664119Z ##[group]Caching Gradle state
+2026-08-19T19:07:30.7051222Z Caching generated-gradle-jars with path '/home/runner/.gradle/caches/9.3.1/generated-gradle-jars/gradle-api-9.3.1.jar' and cache key: gradle-generated-gradle-jars-v1-cb4b032a7d08b9bf1e84e9eacaebcc29
+2026-08-19T19:07:30.7070672Z Caching wrapper-zips with path '/home/runner/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0' and cache key: gradle-wrapper-zips-v1-b0b62de0d10eafd88bc23ee6bea77a84
+2026-08-19T19:07:30.7216191Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/conduit/conduit --files-from manifest.txt --use-compress-program zstdmt
+2026-08-19T19:07:30.7246783Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/conduit/conduit --files-from manifest.txt --use-compress-program zstdmt
+2026-08-19T19:07:31.3096586Z ##[warning]Failed to save cache entry with path '/home/runner/.gradle/caches/9.3.1/generated-gradle-jars/gradle-api-9.3.1.jar' and key: gradle-generated-gradle-jars-v1-cb4b032a7d08b9bf1e84e9eacaebcc29: Error: <h2>Our services aren't available right now</h2><p>We're working to restore all services as soon as possible. Please check back soon.</p>08/6FagAAAABvWDpYCYEuQIlAIl6qCJBJUEhYMzFFREdFMDUxOQBFZGdl
+2026-08-19T19:07:31.4114815Z Caching dependencies with path '/home/runner/.gradle/caches/modules-*/files-*/*/*/*/*' and cache key: gradle-dependencies-v1-95533223fce01af7b38f78e4f461af7a
+2026-08-19T19:07:31.4235585Z Caching instrumented-jars with path '/home/runner/.gradle/caches/jars-*/*/' and cache key: gradle-instrumented-jars-v1-729924a8f13865036af2300fc6d2532f
+2026-08-19T19:07:31.4489832Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/conduit/conduit --files-from manifest.txt --use-compress-program zstdmt
+2026-08-19T19:07:31.4531576Z Caching kotlin-dsl with path '/home/runner/.gradle/caches/*/kotlin-dsl/accessors/*/
+2026-08-19T19:07:31.4535267Z /home/runner/.gradle/caches/*/kotlin-dsl/scripts/*/' and cache key: gradle-kotlin-dsl-v1-ffff30a6bdda05d058e557e48cf70ec2
+2026-08-19T19:07:31.4845961Z Caching groovy-dsl with path '/home/runner/.gradle/caches/*/groovy-dsl/*/' and cache key: gradle-groovy-dsl-v1-05a61c50a8f6b2792f8e315274399878
+2026-08-19T19:07:31.5225364Z ##[warning]Failed to save cache entry with path '/home/runner/.gradle/caches/jars-*/*/' and key: gradle-instrumented-jars-v1-729924a8f13865036af2300fc6d2532f: Error: <h2>Our services aren't available right now</h2><p>We're working to restore all services as soon as possible. Please check back soon.</p>08/6FagAAAAAohmn/yd9pS7Lq+8Bs/Ji6UEhYMzFFREdFMDUyMQBFZGdl
+2026-08-19T19:07:31.5366355Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/conduit/conduit --files-from manifest.txt --use-compress-program zstdmt
+2026-08-19T19:07:31.5510235Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/conduit/conduit --files-from manifest.txt --use-compress-program zstdmt
+2026-08-19T19:07:31.6171225Z ##[warning]Failed to save cache entry with path '/home/runner/.gradle/caches/*/groovy-dsl/*/' and key: gradle-groovy-dsl-v1-05a61c50a8f6b2792f8e315274399878: Error: <h2>Our services aren't available right now</h2><p>We're working to restore all services as soon as possible. Please check back soon.</p>08/6FagAAAACBpA4oe3hSRbBmECJmemDlUEhYMzFFREdFMDUxNABFZGdl
+2026-08-19T19:07:31.8392163Z ##[warning]Failed to save cache entry with path '/home/runner/.gradle/caches/*/kotlin-dsl/accessors/*/
+/home/runner/.gradle/caches/*/kotlin-dsl/scripts/*/' and key: gradle-kotlin-dsl-v1-ffff30a6bdda05d058e557e48cf70ec2: Error: <h2>Our services aren't available right now</h2><p>We're working to restore all services as soon as possible. Please check back soon.</p>08/6FagAAAAAty2jGP2wESZmLOQlSvlgVUEhYMzFFREdFMDIwNgBFZGdl
+2026-08-19T19:07:32.4970538Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/conduit/conduit --files-from manifest.txt --use-compress-program zstdmt
+2026-08-19T19:07:33.2905983Z ##[warning]Failed to save cache entry with path '/home/runner/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0' and key: gradle-wrapper-zips-v1-b0b62de0d10eafd88bc23ee6bea77a84: Error: <h2>Our services aren't available right now</h2><p>We're working to restore all services as soon as possible. Please check back soon.</p>09f6FagAAAABi93k/4PXxQIHSVxeLGztjUEhYMzFFREdFMDIxNQBFZGdl
+2026-08-19T19:07:35.0903548Z Caching transforms with path '/home/runner/.gradle/caches/transforms-4/*/
+2026-08-19T19:07:35.0904154Z /home/runner/.gradle/caches/*/transforms/*/' and cache key: gradle-transforms-v1-063ba42274f82f6665e88cca283f6866
+2026-08-19T19:07:35.1848271Z ##[warning]Failed to save cache entry with path '/home/runner/.gradle/caches/modules-*/files-*/*/*/*/*' and key: gradle-dependencies-v1-95533223fce01af7b38f78e4f461af7a: Error: <h2>Our services aren't available right now</h2><p>We're working to restore all services as soon as possible. Please check back soon.</p>09/6FagAAAACIGqhUbpdsRpY44l28MkUwUEhYMzFFREdFMDIwOQBFZGdl
+2026-08-19T19:07:37.2296745Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/conduit/conduit --files-from manifest.txt --use-compress-program zstdmt
+2026-08-19T19:07:43.0691077Z ##[warning]Failed to save cache entry with path '/home/runner/.gradle/caches/transforms-4/*/
+/home/runner/.gradle/caches/*/transforms/*/' and key: gradle-transforms-v1-063ba42274f82f6665e88cca283f6866: Error: <h2>Our services aren't available right now</h2><p>We're working to restore all services as soon as possible. Please check back soon.</p>0//6FagAAAADseoPY7yyiT7PZ8obE/gksUEhYMzFFREdFMDYyMQBFZGdl
+2026-08-19T19:07:44.7750364Z Caching Gradle User Home with cache key: gradle-home-v1|Linux|build-apk[e080f0fdc288b6f0c5023fd4b86f7a10]-7d490001421e04a099e7a96f5356872dcf52f9cd
+2026-08-19T19:07:44.7852242Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/conduit/conduit --files-from manifest.txt --use-compress-program zstdmt
+2026-08-19T19:07:44.9551651Z ##[warning]Failed to save cache entry with path '/home/runner/.gradle/caches,/home/runner/.gradle/notifications,/home/runner/.gradle/.setup-gradle' and key: gradle-home-v1|Linux|build-apk[e080f0fdc288b6f0c5023fd4b86f7a10]-7d490001421e04a099e7a96f5356872dcf52f9cd: Error: <h2>Our services aren't available right now</h2><p>We're working to restore all services as soon as possible. Please check back soon.</p>0AP+FagAAAABjR4RjJH9dSb/8MLds88txUEhYMzFFREdFMDUxMgBFZGdl
+2026-08-19T19:07:44.9554821Z ##[endgroup]
+2026-08-19T19:07:44.9555007Z Generating Job Summary
+2026-08-19T19:07:44.9564339Z Completed post-action step

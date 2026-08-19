@@ -23,8 +23,9 @@ import 'enhanced_attachment.dart';
 
 import 'package:conduit/shared/widgets/chat_action_button.dart';
 
+import '../../../core/database/database_provider.dart';
 import '../../../core/providers/app_providers.dart'
-    show activeConversationProvider, appDatabaseProvider;
+    show activeConversationProvider;
 import '../../../shared/theme/conduit_input_styles.dart';
 import '../../../shared/widgets/model_avatar.dart';
 import '../../../shared/widgets/conduit_components.dart';

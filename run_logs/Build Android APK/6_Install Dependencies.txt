@@ -1,0 +1,103 @@
+﻿2026-08-19T19:01:23.9397791Z ##[group]Run flutter pub get
+2026-08-19T19:01:23.9398065Z [36;1mflutter pub get[0m
+2026-08-19T19:01:23.9431880Z shell: /usr/bin/bash -e {0}
+2026-08-19T19:01:23.9432103Z env:
+2026-08-19T19:01:23.9432357Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64
+2026-08-19T19:01:23.9432752Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64
+2026-08-19T19:01:23.9433084Z   GRADLE_ACTION_ID: gradle/actions/setup-gradle
+2026-08-19T19:01:23.9433343Z   GRADLE_BUILD_ACTION_SETUP_COMPLETED: true
+2026-08-19T19:01:23.9433580Z   GRADLE_BUILD_ACTION_CACHE_RESTORED: true
+2026-08-19T19:01:23.9433938Z   DEVELOCITY_INJECTION_INIT_SCRIPT_NAME: gradle-actions.inject-develocity.init.gradle
+2026-08-19T19:01:23.9434338Z   DEVELOCITY_AUTO_INJECTION_CUSTOM_VALUE: gradle-actions
+2026-08-19T19:01:23.9434755Z   GITHUB_DEPENDENCY_GRAPH_ENABLED: false
+2026-08-19T19:01:23.9435044Z   FLUTTER_ROOT: /opt/hostedtoolcache/flutter/stable-3.47.0-x64/flutter
+2026-08-19T19:01:23.9435343Z   PUB_CACHE: /home/runner/.pub-cache
+2026-08-19T19:01:23.9435600Z ##[endgroup]
+2026-08-19T19:01:26.9155405Z Resolving dependencies...
+2026-08-19T19:01:28.3651628Z Downloading packages...
+2026-08-19T19:01:46.1630786Z   _fe_analyzer_shared 103.0.0 (105.0.0 available)
+2026-08-19T19:01:46.1631337Z   analysis_server_plugin 0.3.18 (0.3.20 available)
+2026-08-19T19:01:46.1631756Z   analyzer 13.3.0 (14.1.0 available)
+2026-08-19T19:01:46.1632095Z   analyzer_plugin 0.14.12 (0.14.14 available)
+2026-08-19T19:01:46.1632439Z   archive 4.0.9 (4.1.0 available)
+2026-08-19T19:01:46.1632734Z   build 4.0.7 (4.0.10 available)
+2026-08-19T19:01:46.1633062Z   build_config 1.3.1 (1.3.2 available)
+2026-08-19T19:01:46.1633314Z   build_daemon 4.1.2 (4.1.5 available)
+2026-08-19T19:01:46.1633639Z   build_runner 2.15.1 (2.16.0 available)
+2026-08-19T19:01:46.1633963Z   built_value 8.12.6 (8.12.7 available)
+2026-08-19T19:01:46.1634293Z   cached_network_image_ce 4.9.0 (4.10.0 available)
+2026-08-19T19:01:46.1634807Z   cached_network_image_web_ce 2.1.1 (2.1.2 available)
+2026-08-19T19:01:46.1635160Z   cli_util 0.4.2 (0.5.2 available)
+2026-08-19T19:01:46.1635451Z   code_assets 1.2.1 (2.0.0 available)
+2026-08-19T19:01:46.1635758Z   connectivity_plus 7.3.0 (7.3.1 available)
+2026-08-19T19:01:46.1636053Z   dbus 0.7.13 (0.7.14 available)
+2026-08-19T19:01:46.1636310Z   dio 5.10.0 (5.11.0 available)
+2026-08-19T19:01:46.1636583Z   dio_web_adapter 2.2.0 (2.2.1 available)
+2026-08-19T19:01:46.1636869Z   drift 2.34.2 (2.34.3 available)
+2026-08-19T19:01:46.1637146Z   file_picker 12.0.0-beta.7 (12.0.0 available)
+2026-08-19T19:01:46.1637479Z   flutter_cache_manager 3.4.1 (3.4.2 available)
+2026-08-19T19:01:46.1637962Z   flutter_local_notifications 22.1.0 (22.3.0 available)
+2026-08-19T19:01:46.1638466Z   flutter_local_notifications_platform_interface 12.0.1 (12.2.0 available)
+2026-08-19T19:01:46.1638895Z   flutter_secure_storage 10.3.1 (11.0.0 available)
+2026-08-19T19:01:46.1639159Z   flutter_secure_storage_darwin 0.3.2 (0.4.0 available)
+2026-08-19T19:01:46.1639426Z   flutter_secure_storage_linux 3.0.1 (3.0.2 available)
+2026-08-19T19:01:46.1639731Z   flutter_secure_storage_platform_interface 2.0.1 (2.0.3 available)
+2026-08-19T19:01:46.1640011Z   go_router 17.3.0 (17.5.0 available)
+2026-08-19T19:01:46.1640215Z   hooks 2.0.2 (2.2.0 available)
+2026-08-19T19:01:46.1640402Z   image 4.9.1 (4.9.2 available)
+2026-08-19T19:01:46.1640587Z   jni 1.0.0 (1.0.3 available)
+2026-08-19T19:01:46.1640796Z   jni_flutter 1.0.1 (1.0.2 available)
+2026-08-19T19:01:46.1641020Z   json_serializable 6.14.0 (6.14.1 available)
+2026-08-19T19:01:46.1641270Z   material_color_utilities 0.13.0 (0.13.1 available)
+2026-08-19T19:01:46.1641872Z ! mermaid_core 0.1.0 from path third_party/mermaid/packages/mermaid_core (overridden)
+2026-08-19T19:01:46.1642247Z   native_toolchain_c 0.19.2 (0.19.4 available)
+2026-08-19T19:01:46.1642483Z   objective_c 9.4.1 (9.5.0 available)
+2026-08-19T19:01:46.1642694Z   ollama_dart 2.4.0 (2.5.0 available)
+2026-08-19T19:01:46.1642900Z   openai_dart 7.0.1 (8.0.0 available)
+2026-08-19T19:01:46.1643292Z   package_config 2.2.0 (3.0.0 available)
+2026-08-19T19:01:46.1643533Z   permission_handler 12.0.3 (13.0.1 available)
+2026-08-19T19:01:46.1643796Z   permission_handler_android 13.0.1 (14.0.0 available)
+2026-08-19T19:01:46.1644068Z   permission_handler_apple 9.4.10 (9.6.1 available)
+2026-08-19T19:01:46.1644335Z   permission_handler_html 0.1.3+5 (0.1.4+1 available)
+2026-08-19T19:01:46.1644878Z   permission_handler_platform_interface 4.3.0 (4.4.0 available)
+2026-08-19T19:01:46.1645337Z   permission_handler_windows 0.2.1 (0.2.2 available)
+2026-08-19T19:01:46.1645698Z   posix 6.5.0 (6.5.2 available)
+2026-08-19T19:01:46.1645991Z ! record 7.1.1 (overridden)
+2026-08-19T19:01:46.1646272Z   record_use 0.6.0 (1.1.1 available)
+2026-08-19T19:01:46.1646589Z   share_plus 13.2.1 (13.3.0 available)
+2026-08-19T19:01:46.1646966Z   share_plus_platform_interface 7.1.0 (7.2.0 available)
+2026-08-19T19:01:46.1647335Z   source_gen 4.2.3 (4.3.0 available)
+2026-08-19T19:01:46.1647646Z   source_helper 1.3.12 (1.3.13 available)
+2026-08-19T19:01:46.1647977Z   sqlite3 3.5.0 (3.5.1 available)
+2026-08-19T19:01:46.1648238Z   synchronized 3.4.1 (3.4.1+2 available)
+2026-08-19T19:01:46.1648446Z   test 1.31.1 (1.31.2 available)
+2026-08-19T19:01:46.1648640Z   test_api 0.7.12 (0.7.13 available)
+2026-08-19T19:01:46.1648846Z   test_core 0.6.18 (0.6.19 available)
+2026-08-19T19:01:46.1649054Z   vector_graphics 1.2.2 (1.2.3 available)
+2026-08-19T19:01:46.1649286Z   vector_graphics_compiler 1.2.6 (1.3.0 available)
+2026-08-19T19:01:46.1649531Z   vm_service 15.2.0 (15.3.0 available)
+2026-08-19T19:01:46.1649752Z   webview_flutter_android 4.13.0 (4.14.0 available)
+2026-08-19T19:01:46.1649984Z   win32 6.3.0 (6.4.0 available)
+2026-08-19T19:01:46.1650216Z Got dependencies!
+2026-08-19T19:01:46.1650480Z 61 packages have newer versions incompatible with dependency constraints.
+2026-08-19T19:01:46.1650916Z Try `flutter pub outdated` for more information.
+2026-08-19T19:01:46.7382757Z "cs": 4 untranslated message(s).
+2026-08-19T19:01:46.7383224Z "de": 4 untranslated message(s).
+2026-08-19T19:01:46.7383593Z "es": 4 untranslated message(s).
+2026-08-19T19:01:46.7383903Z "fr": 4 untranslated message(s).
+2026-08-19T19:01:46.7384200Z "it": 4 untranslated message(s).
+2026-08-19T19:01:46.7384693Z "ja": 4 untranslated message(s).
+2026-08-19T19:01:46.7384992Z "ko": 4 untranslated message(s).
+2026-08-19T19:01:46.7385289Z "nl": 4 untranslated message(s).
+2026-08-19T19:01:46.7385588Z "ru": 4 untranslated message(s).
+2026-08-19T19:01:46.7385879Z "sk": 4 untranslated message(s).
+2026-08-19T19:01:46.7386168Z "zh": 4 untranslated message(s).
+2026-08-19T19:01:46.7386469Z "zh_Hant": 4 untranslated message(s).
+2026-08-19T19:01:46.7386921Z To see a detailed report, use the untranslated-messages-file 
+2026-08-19T19:01:46.7387229Z option in the l10n.yaml file:
+2026-08-19T19:01:46.7387475Z untranslated-messages-file: desiredFileName.txt
+2026-08-19T19:01:46.7387737Z <other option>: <other selection> 
+2026-08-19T19:01:46.7387873Z 
+2026-08-19T19:01:46.7387879Z 
+2026-08-19T19:01:46.7388030Z This will generate a JSON format file containing all messages that 
+2026-08-19T19:01:46.7388321Z need to be translated.
