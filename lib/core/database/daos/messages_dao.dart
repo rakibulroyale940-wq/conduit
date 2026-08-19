@@ -7,6 +7,7 @@ import '../mappers/chat_blob_mapper.dart';
 import '../models/chat_transcript_window.dart';
 import '../tables/chats.dart';
 import '../tables/messages.dart';
+import 'outbox_dao.dart';
 
 part 'messages_dao.g.dart';
 
@@ -220,6 +221,51 @@ class MessagesDao extends DatabaseAccessor<AppDatabase>
           dirty: const Value(false),
         ),
       );
+      return true;
+    });
+  }
+
+  /// Updates message content locally, marks both message and chat dirty,
+  /// bumps chat updatedAt, and enqueues an updateChat outbox operation.
+  Future<bool> updateMessageContentWithOutbox({
+    required String chatId,
+    required String messageId,
+    required String content,
+    int? nowEpochSeconds,
+  }) {
+    return transaction(() async {
+      final existing = await _messageById(chatId, messageId);
+      if (existing == null) return false;
+
+      final payload = _decodePayloadMap(existing.payload);
+      payload['id'] = messageId;
+      payload['role'] = existing.role;
+      payload['content'] = content;
+
+      await (update(messages)
+            ..where((t) => t.chatId.equals(chatId) & t.id.equals(messageId)))
+          .write(
+        MessagesCompanion(
+          content: Value(content),
+          payload: Value(jsonEncode(payload)),
+          dirty: const Value(true),
+        ),
+      );
+
+      final now =
+          nowEpochSeconds ?? (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+      await (update(chats)..where((t) => t.id.equals(chatId))).write(
+        ChatsCompanion(
+          updatedAt: Value(now),
+          dirty: const Value(true),
+        ),
+      );
+
+      await attachedDatabase.outboxDao.enqueue(
+        kind: OutboxKind.updateChat,
+        chatId: chatId,
+      );
+
       return true;
     });
   }

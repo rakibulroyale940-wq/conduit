@@ -23,6 +23,9 @@ import 'enhanced_attachment.dart';
 
 import 'package:conduit/shared/widgets/chat_action_button.dart';
 
+import '../../../core/providers/app_providers.dart'
+    show activeConversationProvider, appDatabaseProvider;
+import '../../../shared/theme/conduit_input_styles.dart';
 import '../../../shared/widgets/model_avatar.dart';
 import '../../../shared/widgets/conduit_components.dart';
 import '../../../shared/widgets/middle_ellipsis_text.dart';
@@ -30,6 +33,7 @@ import '../../../shared/widgets/web_content_embed.dart';
 import '../providers/chat_providers.dart'
     show
         chatComposerTextInsertionTargetId,
+        chatMessagesProvider,
         isChatStreamingProvider,
         sendMessageWithContainer,
         streamingContentProvider;
@@ -123,6 +127,9 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
   late CurvedAnimation _streamingContentFade;
   String _displayedContent = '';
   late final ValueNotifier<String> _displayedContentListenable;
+  bool _isEditing = false;
+  late final TextEditingController _editController = TextEditingController();
+  final FocusNode _editFocusNode = FocusNode();
   Widget? _cachedAvatar;
   String? _cachedAvatarModelName;
   String? _cachedAvatarIconUrl;
@@ -255,6 +262,9 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
     if (_disableAnimations && !_streamingContentFadeController.isCompleted) {
       _streamingContentFadeController.value = 1.0;
     }
+    _cachedAvatar = null;
+    _cachedAvatarModelName = null;
+    _cachedAvatarIconUrl = null;
     // Build cached avatar when theme context is available
     _buildCachedAvatar();
   }
@@ -266,6 +276,8 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
     final messageChanged = oldWidget.message.id != widget.message.id;
 
     if (messageChanged) {
+      _isEditing = false;
+      _activeVersionIndex = -1;
       _lastStreamingContent = null;
       _displayedContent = '';
       _displayedContentListenable.value = '';
@@ -282,6 +294,10 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
 
     if (!oldWidget.isStreaming && widget.isStreaming) {
       _clearVisibleFollowUps();
+    }
+
+    if (!oldWidget.isStreaming && widget.isStreaming && _isEditing) {
+      _cancelInlineEdit();
     }
 
     // Re-sync subscription when streaming state changes
@@ -457,6 +473,9 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
   }
 
   void _setActiveVersionIndex(int nextIndex) {
+    if (_isEditing) {
+      _cancelInlineEdit();
+    }
     final raw = _resolvedMessageContent(null, nextIndex);
     setState(() {
       _activeVersionIndex = nextIndex;
@@ -960,6 +979,8 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
     _streamingContentFade.dispose();
     _streamingContentFadeController.dispose();
     _displayedContentListenable.dispose();
+    _editController.dispose();
+    _editFocusNode.dispose();
     super.dispose();
   }
 
@@ -1022,6 +1043,249 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
     return false;
   }
 
+  void _startInlineEdit() {
+    if (_isEditing) return;
+    setState(() {
+      _isEditing = true;
+      _editController.text = _displayedContent;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _editFocusNode.requestFocus();
+      }
+    });
+  }
+
+  void _cancelInlineEdit() {
+    if (!_isEditing) return;
+    setState(() {
+      _isEditing = false;
+      _editController.text = _displayedContent;
+    });
+    _editFocusNode.unfocus();
+  }
+
+  Future<void> _saveInlineEdit() async {
+    final newText = _editController.text.trim();
+    final oldText = _displayedContent.trim();
+    if (newText.isEmpty || newText == oldText) {
+      _cancelInlineEdit();
+      return;
+    }
+
+    final messageId = _messageId;
+    if (messageId.isEmpty) {
+      return;
+    }
+
+    try {
+      ref.read(chatMessagesProvider.notifier).updateMessageById(
+        messageId,
+        (current) {
+          if (_activeVersionIndex >= 0 &&
+              _activeVersionIndex < current.versions.length) {
+            final updatedVersions =
+                List<ChatMessageVersion>.from(current.versions);
+            updatedVersions[_activeVersionIndex] =
+                updatedVersions[_activeVersionIndex].copyWith(content: newText);
+            return current.copyWith(versions: updatedVersions);
+          }
+          return current.copyWith(content: newText);
+        },
+      );
+
+      final activeConv = ref.read(activeConversationProvider);
+      final db = ref.read(appDatabaseProvider);
+      if (activeConv != null && db != null) {
+        final targetMessageId =
+            (_activeVersionIndex >= 0 &&
+                    _activeVersionIndex < widget.message.versions.length)
+                ? widget.message.versions[_activeVersionIndex].id
+                : messageId;
+        await db.messagesDao.updateMessageContentWithOutbox(
+          chatId: activeConv.id,
+          messageId: targetMessageId,
+          content: newText,
+        );
+      }
+
+      if (mounted) {
+        setState(() {
+          _displayedContent = newText;
+          _isEditing = false;
+        });
+        _displayedContentListenable.value = newText;
+        _resetTtsPlainTextState();
+        _editFocusNode.unfocus();
+      }
+    } catch (error, stackTrace) {
+      ref.read(chatMessagesProvider.notifier).updateMessageById(
+        messageId,
+        (current) {
+          if (_activeVersionIndex >= 0 &&
+              _activeVersionIndex < current.versions.length) {
+            final updatedVersions =
+                List<ChatMessageVersion>.from(current.versions);
+            updatedVersions[_activeVersionIndex] =
+                updatedVersions[_activeVersionIndex].copyWith(content: oldText);
+            return current.copyWith(versions: updatedVersions);
+          }
+          return current.copyWith(content: oldText);
+        },
+      );
+      DebugLogger.error(
+        'assistant-inline-edit-failed',
+        scope: 'chat/assistant/edit',
+        error: error,
+        stackTrace: stackTrace,
+        data: {'messageId': _messageId},
+      );
+      if (mounted) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorMessage)),
+        );
+      }
+    } finally {
+      if (mounted && _isEditing) {
+        setState(() {
+          _isEditing = false;
+        });
+        _editFocusNode.unfocus();
+      }
+    }
+  }
+
+  Widget _buildInlineEditContainer() {
+    final theme = context.conduitTheme;
+    final inlineEditTextColor = theme.textPrimary;
+    final inlineEditFill = theme.surfaceContainer.withValues(alpha: 0.92);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Focus(
+          focusNode: _editFocusNode,
+          autofocus: true,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: inlineEditFill,
+              borderRadius: BorderRadius.circular(AppBorderRadius.small),
+              border: Border.all(
+                color: theme.inputBorderFocused.withValues(alpha: 0.5),
+                width: BorderWidth.thin,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Spacing.sm,
+                vertical: Spacing.xs,
+              ),
+              child: AdaptiveTextField(
+                controller: _editController,
+                maxLines: null,
+                style: AppTypography.chatMessageStyle.copyWith(
+                  color: inlineEditTextColor,
+                ),
+                padding: EdgeInsets.zero,
+                cupertinoDecoration: const BoxDecoration(),
+                decoration: context.conduitInputStyles
+                    .borderless()
+                    .copyWith(
+                      isCollapsed: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: Spacing.sm),
+        _buildEditActionButtons(),
+      ],
+    );
+  }
+
+  Widget _buildEditActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = context.conduitTheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        // Cancel button
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _cancelInlineEdit,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Spacing.md,
+              vertical: Spacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: theme.surfaceContainer,
+              borderRadius: BorderRadius.circular(AppBorderRadius.small),
+              border: Border.all(
+                color: theme.cardBorder,
+                width: BorderWidth.thin,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Platform.isIOS ? CupertinoIcons.xmark : Icons.close,
+                  size: IconSize.xs,
+                  color: theme.textSecondary,
+                ),
+                const SizedBox(width: Spacing.xs),
+                Text(
+                  l10n.cancel,
+                  style: AppTypography.standard.copyWith(
+                    color: theme.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: Spacing.sm),
+        // Save button
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _saveInlineEdit,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Spacing.md,
+              vertical: Spacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: theme.buttonPrimary,
+              borderRadius: BorderRadius.circular(AppBorderRadius.small),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Platform.isIOS ? CupertinoIcons.check_mark : Icons.check,
+                  size: IconSize.xs,
+                  color: theme.buttonPrimaryText,
+                ),
+                const SizedBox(width: Spacing.xs),
+                Text(
+                  l10n.save,
+                  style: AppTypography.standard.copyWith(
+                    color: theme.buttonPrimaryText,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return _buildDocumentationMessage();
@@ -1056,7 +1320,8 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
         queuedCompletion != null && _isAssistantResponseEmpty;
     final showQueuedRecoveryBanner =
         queuedCompletion != null && !showQueuedAsEmptyState;
-    final shouldBuildActionFooter = _showActionRowNow && !hasQueuedCompletion;
+    final shouldBuildActionFooter =
+        _showActionRowNow && !hasQueuedCompletion && !_isEditing;
     final contentSources = _resolveActiveSources();
     final responseBuilder = ref.watch(assistantResponseBuilderProvider);
     final activeFollowUps = shouldBuildActionFooter
@@ -1118,6 +1383,8 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
                   _buildQueuedCompletionBanner(queuedCompletion)
                 else if (suppressEmptyQueuedContent)
                   const SizedBox.shrink()
+                else if (_isEditing)
+                  _buildInlineEditContainer()
                 else
                   // Content streams in here. Empty content renders as
                   // SizedBox.shrink, and the footer indicator covers that
@@ -1943,6 +2210,13 @@ class _AssistantMessageWidgetState extends ConsumerState<AssistantMessageWidget>
         label: l10n.copy,
         onTap: _responseCompleted ? widget.onCopy : null,
         sfSymbol: 'doc.on.clipboard',
+      ),
+      _AssistantFooterAction(
+        id: 'edit',
+        icon: Platform.isIOS ? CupertinoIcons.pencil : Icons.edit_outlined,
+        label: l10n.edit,
+        onTap: _responseCompleted ? _startInlineEdit : null,
+        sfSymbol: 'pencil',
       ),
       if (shouldShowTtsButton)
         _AssistantFooterAction(

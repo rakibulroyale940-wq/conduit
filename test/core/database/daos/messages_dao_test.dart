@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:checks/checks.dart';
 import 'package:collection/collection.dart';
 import 'package:conduit/core/database/app_database.dart';
+import 'package:conduit/core/database/daos/outbox_dao.dart';
 import 'package:conduit/core/database/mappers/chat_blob_mapper.dart';
 import 'package:conduit/core/database/models/chat_transcript_window.dart';
 import 'package:drift/drift.dart';
@@ -597,5 +598,263 @@ void main() {
         check(row.dirty).isFalse();
       },
     );
+
+    test(
+      'markAssistantCompletionRecoveryFailed sets failure state and settles placeholder',
+      () async {
+        await db.chatsDao.upsertEnvelopeStub(
+          id: 'chat-fail',
+          title: 'Fail',
+          createdAt: 1,
+          updatedAt: 1,
+        );
+        await db.messagesDao.upsertLocalEcho(
+          echo(
+            chatId: 'chat-fail',
+            id: 'assistant-fail',
+            content: '',
+            payload: const {
+              'id': 'assistant-fail',
+              'role': 'assistant',
+              'content': '',
+              'isStreaming': true,
+              'metadata': {'checkpoint': true},
+            },
+          ),
+        );
+
+        final marked =
+            await db.messagesDao.markAssistantCompletionRecoveryFailed(
+          chatId: 'chat-fail',
+          messageId: 'assistant-fail',
+          error: 'Connection reset by peer',
+        );
+
+        check(marked).isTrue();
+        final row = (await db.messagesDao.getForChat('chat-fail')).single;
+        final payload = jsonDecode(row.payload) as Map<String, dynamic>;
+        final metadata = payload['metadata'] as Map<String, dynamic>;
+        check(payload['isStreaming']).equals(false);
+        check(payload['done']).equals(true);
+        check((payload['error'] as Map<String, dynamic>)['content'])
+            .equals('Connection reset by peer');
+        check(metadata['completionSubmitted']).equals(true);
+        check(metadata['responseDone']).equals(true);
+        check(metadata['checkpoint']).equals(true);
+        check(row.dirty).isFalse();
+      },
+    );
+  });
+
+  group('updateMessageContentWithOutbox', () {
+    MessageRowData echo({
+      required String chatId,
+      required String id,
+      String? parentId,
+      String role = 'user',
+      String content = 'original message',
+      int createdAt = 1749700100,
+      Map<String, dynamic>? payload,
+    }) {
+      return MessageRowData(
+        id: id,
+        chatId: chatId,
+        parentId: parentId,
+        role: role,
+        content: content,
+        model: 'llama3.1:8b',
+        createdAt: createdAt,
+        orderIndex: -1,
+        payload: payload ??
+            {
+              'id': id,
+              'role': role,
+              'content': content,
+              'timestamp': createdAt,
+              'metadata': {'userCustomField': 'preserved'},
+            },
+      );
+    }
+
+    test(
+      'updates content and payload, marks both message and chat dirty, sets updatedAt and enqueues updateChat',
+      () async {
+        await db.chatsDao.upsertEnvelopeStub(
+          id: 'chat-edit-1',
+          title: 'Edit Chat',
+          createdAt: 100,
+          updatedAt: 100,
+        );
+        await db.messagesDao.upsertLocalEcho(
+          echo(chatId: 'chat-edit-1', id: 'm-edit-1', content: 'original'),
+        );
+
+        final result = await db.messagesDao.updateMessageContentWithOutbox(
+          chatId: 'chat-edit-1',
+          messageId: 'm-edit-1',
+          content: 'updated content',
+          nowEpochSeconds: 250,
+        );
+
+        check(result).isTrue();
+
+        // 1. Message row validation
+        final message =
+            await db.messagesDao.getMessage('chat-edit-1', 'm-edit-1');
+        check(message).isNotNull();
+        check(message!.content).equals('updated content');
+        check(message.dirty).isTrue();
+
+        // 2. Payload validation (preserved existing keys, updated content/id/role)
+        final payload = jsonDecode(message.payload) as Map<String, dynamic>;
+        check(payload['id']).equals('m-edit-1');
+        check(payload['role']).equals('user');
+        check(payload['content']).equals('updated content');
+        check((payload['metadata'] as Map<String, dynamic>)['userCustomField'])
+            .equals('preserved');
+
+        // 3. Chat row validation
+        final chat = await db.chatsDao.getChat('chat-edit-1');
+        check(chat).isNotNull();
+        check(chat!.updatedAt).equals(250);
+        check(chat.dirty).isTrue();
+
+        // 4. Outbox op validation
+        final ops = await db.outboxDao.pendingForChat('chat-edit-1');
+        check(ops.length).equals(1);
+        check(ops.single.kind).equals(OutboxKind.updateChat.name);
+      },
+    );
+
+    test('falls back to wall-clock epoch seconds when nowEpochSeconds is null', () async {
+      await db.chatsDao.upsertEnvelopeStub(
+        id: 'chat-fallback-clock',
+        title: 'Fallback Clock',
+        createdAt: 100,
+        updatedAt: 100,
+      );
+      await db.messagesDao.upsertLocalEcho(
+        echo(chatId: 'chat-fallback-clock', id: 'm-clock', content: 'hello'),
+      );
+
+      final before = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      final result = await db.messagesDao.updateMessageContentWithOutbox(
+        chatId: 'chat-fallback-clock',
+        messageId: 'm-clock',
+        content: 'hello clock',
+      );
+      final after = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+      check(result).isTrue();
+      final chat = await db.chatsDao.getChat('chat-fallback-clock');
+      check(chat!.updatedAt).isGreaterOrEqual(before);
+      check(chat.updatedAt).isLessOrEqual(after);
+      check(chat.dirty).isTrue();
+    });
+
+    test('returns false with zero side effects when message does not exist', () async {
+      await db.chatsDao.upsertEnvelopeStub(
+        id: 'chat-nonexistent-msg',
+        title: 'Non-existent',
+        createdAt: 100,
+        updatedAt: 100,
+      );
+
+      final result = await db.messagesDao.updateMessageContentWithOutbox(
+        chatId: 'chat-nonexistent-msg',
+        messageId: 'missing-msg-id',
+        content: 'new content',
+        nowEpochSeconds: 300,
+      );
+
+      check(result).isFalse();
+
+      // Chat row remains untouched
+      final chat = await db.chatsDao.getChat('chat-nonexistent-msg');
+      check(chat!.updatedAt).equals(100);
+      check(chat.dirty).isFalse();
+
+      // Outbox remains empty
+      final ops = await db.outboxDao.pendingForChat('chat-nonexistent-msg');
+      check(ops).isEmpty();
+    });
+
+    test('resiliently handles corrupted JSON and empty string payload', () async {
+      await db.chatsDao.upsertEnvelopeStub(
+        id: 'chat-corrupt',
+        title: 'Corrupt',
+        createdAt: 100,
+        updatedAt: 100,
+      );
+
+      // Insert message with corrupted JSON string
+      await db.into(db.messages).insert(
+        MessagesCompanion.insert(
+          id: 'm-corrupt',
+          chatId: 'chat-corrupt',
+          role: 'user',
+          content: 'old broken payload',
+          createdAt: 100,
+          orderIndex: 0,
+          payload: '{invalid json string ::: missing closing',
+          dirty: const Value(false),
+        ),
+      );
+
+      final result = await db.messagesDao.updateMessageContentWithOutbox(
+        chatId: 'chat-corrupt',
+        messageId: 'm-corrupt',
+        content: 'repaired content',
+        nowEpochSeconds: 200,
+      );
+
+      check(result).isTrue();
+
+      final message = await db.messagesDao.getMessage('chat-corrupt', 'm-corrupt');
+      check(message).isNotNull();
+      check(message!.content).equals('repaired content');
+      check(message.dirty).isTrue();
+
+      // Valid json recovered with required keys
+      final payload = jsonDecode(message.payload) as Map<String, dynamic>;
+      check(payload['id']).equals('m-corrupt');
+      check(payload['role']).equals('user');
+      check(payload['content']).equals('repaired content');
+    });
+
+    test('consecutive updates coalesce to a single pending outbox op', () async {
+      await db.chatsDao.upsertEnvelopeStub(
+        id: 'chat-coalesce',
+        title: 'Coalesce',
+        createdAt: 100,
+        updatedAt: 100,
+      );
+      await db.messagesDao.upsertLocalEcho(
+        echo(chatId: 'chat-coalesce', id: 'm-c1', content: 'v1'),
+      );
+
+      await db.messagesDao.updateMessageContentWithOutbox(
+        chatId: 'chat-coalesce',
+        messageId: 'm-c1',
+        content: 'v2',
+        nowEpochSeconds: 150,
+      );
+      await db.messagesDao.updateMessageContentWithOutbox(
+        chatId: 'chat-coalesce',
+        messageId: 'm-c1',
+        content: 'v3',
+        nowEpochSeconds: 200,
+      );
+
+      final ops = await db.outboxDao.pendingForChat('chat-coalesce');
+      check(ops.length).equals(1);
+      check(ops.single.kind).equals(OutboxKind.updateChat.name);
+
+      final chat = await db.chatsDao.getChat('chat-coalesce');
+      check(chat!.updatedAt).equals(200);
+
+      final message = await db.messagesDao.getMessage('chat-coalesce', 'm-c1');
+      check(message!.content).equals('v3');
+    });
   });
 }
