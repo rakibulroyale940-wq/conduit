@@ -19,6 +19,8 @@ jobs:
   build-apk:
     name: Build Android APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repository
@@ -49,13 +51,82 @@ jobs:
       - name: Generate Code (build_runner)
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Build Android APK (Release)
+      - name: Setup Release Keystore
+        run: |
+          mkdir -p android/app
+          keytool -genkeypair -v \
+            -keystore android/app/release.jks \
+            -alias conduit \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass conduit123 \
+            -keypass conduit123 \
+            -dname "CN=Conduit, OU=App, O=Conduit, L=BR, S=SP, C=BR"
+
+          cat << 'EOF' > android/key.properties
+          storePassword=conduit123
+          keyPassword=conduit123
+          keyAlias=conduit
+          storeFile=release.jks
+          EOF
+
+      - name: Build Universal Release APK
         run: flutter build apk --release
 
-      - name: Upload APK Artifact
+      - name: Build Split-per-ABI Release APKs
+        run: flutter build apk --release --split-per-abi
+
+      - name: Build Debug APK
+        run: flutter build apk --debug
+
+      - name: Organize Artifacts and Verify Signatures
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk dist/conduit-universal-release.apk
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk dist/conduit-arm64-v8a-release.apk
+          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk dist/conduit-armeabi-v7a-release.apk
+          cp build/app/outputs/flutter-apk/app-x86_64-release.apk dist/conduit-x86_64-release.apk
+          cp build/app/outputs/flutter-apk/app-debug.apk dist/conduit-debug.apk
+
+          echo "=== Verifying APK Signatures with apksigner ==="
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name apksigner | sort -V | tail -n 1)
+          echo "Using apksigner: $APKSIGNER"
+
+          for apk in dist/*.apk; do
+            echo "----------------------------------------"
+            echo "Verifying $apk:"
+            $APKSIGNER verify --verbose "$apk"
+          done
+
+      - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: conduit-apk-release
-          path: build/app/outputs/flutter-apk/*.apk
-          retention-days: 14
+          name: conduit-apks
+          path: dist/*.apk
+          retention-days: 30
           if-no-files-found: error
+
+      - name: Publish or Update GitHub Release
+        uses: ncipollo/release-action@v1
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          artifacts: "dist/*.apk"
+          tag: "latest-apk"
+          name: "Conduit Android APK (Latest Build)"
+          body: |
+            ## Conduit Android APKs (Signed Release & Debug)
+
+            ### Available Downloads:
+            - **Universal Release APK (Recommended for all devices):** [`conduit-universal-release.apk`](https://github.com/rakibulroyale940-wq/conduit/releases/download/latest-apk/conduit-universal-release.apk)
+            - **ARM64 (Modern 64-bit phones):** [`conduit-arm64-v8a-release.apk`](https://github.com/rakibulroyale940-wq/conduit/releases/download/latest-apk/conduit-arm64-v8a-release.apk)
+            - **ARMv7 (Older 32-bit phones):** [`conduit-armeabi-v7a-release.apk`](https://github.com/rakibulroyale940-wq/conduit/releases/download/latest-apk/conduit-armeabi-v7a-release.apk)
+            - **x86_64 (Emulators / Tablets):** [`conduit-x86_64-release.apk`](https://github.com/rakibulroyale940-wq/conduit/releases/download/latest-apk/conduit-x86_64-release.apk)
+            - **Debug APK (Universal fallback):** [`conduit-debug.apk`](https://github.com/rakibulroyale940-wq/conduit/releases/download/latest-apk/conduit-debug.apk)
+
+            ### Installation Notes:
+            1. If you have previously installed another build of Conduit (official or debug), **uninstall it first** from your phone to avoid signature conflicts.
+            2. Download and install `conduit-universal-release.apk`.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          makeLatest: true
